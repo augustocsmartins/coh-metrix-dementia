@@ -20,6 +20,8 @@ lib64
 include
 share
 
+.ropeproject
+
 # Installer logs
 pip-log.txt
 
