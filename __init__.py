@@ -7,8 +7,7 @@ from .base import (
 )
 
 from .metrics import *
-
-#TODO: remove 'base' from modules in metrics.
+from .resources import *
 
 __all__ = sorted([m for m in locals().keys()
                   if not m.startswith('_')])
