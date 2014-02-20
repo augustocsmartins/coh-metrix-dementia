@@ -42,6 +42,9 @@ class Text(object):
         self.genre = genre
         self.content = content
 
+    def __str__(self):
+        return '<Text: %s...>' % (self.content[:70])
+
 
 class Category(object):
     """Represents a set of taxonomically related metrics.
