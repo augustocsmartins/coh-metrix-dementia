@@ -24,15 +24,6 @@ class SyllableSeparator(object):
 
         Keyword arguments:
         encoding -- the encoding of the words and syllables files.
-        verbose -- true for detailed message printinTest the accuracy of the separation method.
-
-        Required arguments:
-        words_file_path -- path to a file containing one word per line.
-        syllables_file_path -- path to a file containing the same words
-            of words_file_path with the syllables separated by a -.
-
-        Keyword arguments:
-        encoding -- the encoding of the words and syllables files.
         verbose -- true for detailed message printing.
         """
         import codecs
