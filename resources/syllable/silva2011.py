@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #-*- encoding:utf-8 -*-
 
-# silva2011.py - Syllabic separation using the algorithm described in Silva
+# silva2011.py - Syllable separation using the algorithm described in Silva
 # [2011].
 # Copyright (C) 2014  Alessandro Bokan
 #
@@ -22,8 +22,8 @@
 #           Andre Cunha      <andre.lv.cunha@gmail.com> (minor modifications)
 
 
-from cases import case1, case2, case3, case4, case5, case6, case7, case8
-from tonic import tonic_vowel
+from .cases import case1, case2, case3, case4, case5, case6, case7, case8
+from .tonic import tonic_vowel
 
 import re
 from sys import argv
@@ -53,7 +53,7 @@ CN = ['m', 'n']
 C = ['lh', 'nh'] + CO + CF + CL + CN
 
 
-class Silva2011SyllableSeparator:
+class Silva2011SyllableSeparator(object):
     """This class implements the syllabic separation algorithm presented in
     the fourth chapther of the PhD thesis:
 
@@ -62,7 +62,7 @@ class Silva2011SyllableSeparator:
         em HMM. PhD dissertation, COPPE, UFRJ.
     """
 
-    def separate_syllables(self, w):
+    def separate(self, w):
         """Separate the syllables of a word.
 
         Required arguments:
@@ -599,4 +599,4 @@ if __name__ == '__main__':
     if len(argv) == 1:
         separator._test()
     else:
-        print(separator.separate_syllables(argv[1]))
+        print(separator.separate(argv[1]))
