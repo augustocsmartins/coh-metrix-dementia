@@ -24,6 +24,7 @@
 
 from .cases import case1, case2, case3, case4, case5, case6, case7, case8
 from .tonic import tonic_vowel
+from .api import SyllableSeparator
 
 import re
 from sys import argv
@@ -53,7 +54,7 @@ CN = ['m', 'n']
 C = ['lh', 'nh'] + CO + CF + CL + CN
 
 
-class Silva2011SyllableSeparator(object):
+class Silva2011SyllableSeparator(SyllableSeparator):
     """This class implements the syllabic separation algorithm presented in
     the fourth chapther of the PhD thesis:
 

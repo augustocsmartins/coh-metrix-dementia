@@ -1,3 +1,4 @@
-from .silva2011 import Silva2011SyllabicSeparator
+from .silva2011 import Silva2011SyllableSeparator
+from .ceci import CECISyllableSeparator
 
-syllabic_separator = Silva2011SyllabicSeparator()
+syllable_separator = CECISyllableSeparator()
