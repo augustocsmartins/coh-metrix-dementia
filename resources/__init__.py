@@ -1,3 +1,2 @@
-from .taggers import pos_tagger
-from .senters import senter
+from .tokenizers import pos_tagger, senter, word_tokenize
 from .syllable import *
