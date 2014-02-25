@@ -1,16 +1,16 @@
 # base.py - Basic classes for accessing Coh-Metrix-Port's functionality.
 # Copyright (C) 2014  Andre Luiz Verucci da Cunha
-
+#
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
 # Software Foundation, either version 3 of the License, or (at your option)
 # any later version.
-
+#
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 # more details.
-
+#
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -21,14 +21,17 @@ class Text(object):
     A text has several (optional) attributes: title, author,
     source, publication data and genre.
     """
-    def __init__(self, content, title='', author='', source='',
-                 publication_date='', genre=''):
+    def __init__(self, filepath, encoding='utf-8', title='', author='',
+                 source='', publication_date='', genre=''):
         """Form a text.
 
         Required arguments:
-        content -- the content of the text, in a single string.
+        filepath -- a path to the file containing the text. The text is
+            supposed to be formatted as one paragraph per line, with
+            multiple sentences per paragraph. Blank lines are ignored.
 
         Keyword arguments:
+        encoding -- The encoding of the input file (default "utf-8")
         title -- The title of the text (default "").
         author -- The author of the text (default "").
         source -- Where the text came from, usually a URL (default "").
@@ -40,10 +43,54 @@ class Text(object):
         self.source = source
         self.publication_date = publication_date
         self.genre = genre
-        self.content = content
+
+        import codecs
+        with codecs.open(filepath, mode='r', encoding=encoding)\
+                as input_file:
+            content = input_file.readlines()
+
+            self.paragraphs = [line.strip() for line in content
+                               if not line.isspace()]
 
     def __str__(self):
-        return '<Text: %s...>' % (self.content[:70])
+        return '<Text: "%s...">' % (self.paragraphs[0][:70])
+
+    @property
+    def sentences(self):
+        """Return a list of strings, each one being a sentence of the text.
+        """
+        if not hasattr(self, '_sentences'):
+            from itertools import chain
+            from .resources import senter
+
+            _sentences = chain(*map(senter.tokenize, self.paragraphs))
+            self._sentences = list(_sentences)
+
+        return self._sentences
+
+    @property
+    def words(self):
+        """Return a list of lists of strings, where each list of strings
+            corresponds to a sentence, and each string in the list is a word.
+        """
+        if not hasattr(self, '_words'):
+            from .resources import word_tokenize
+
+            self._words = list(map(word_tokenize, self.sentences))
+
+        return self._words
+
+    @property
+    def tokenized_sentences(self):
+        """Return a list of lists of pairs (string, string), representing
+            the sentences with tokenized words.
+        """
+        if not hasattr(self, '_tokenized_sentences'):
+            from .resources import pos_tagger
+
+            self._tokenized_sentences = pos_tagger.batch_tag(self.words)
+
+        return self._tokenized_sentences
 
 
 class Category(object):
