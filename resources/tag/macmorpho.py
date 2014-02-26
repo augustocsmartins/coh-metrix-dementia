@@ -58,6 +58,8 @@ class MacMorphoTagSet(TagSet):
     functions_as_noun_tags = ['N', 'NPROP', 'PROSUB']
     functions_as_adjective_tags = ['ADJ', 'PROADJ']
 
+    punctuation_tags = ['PU']
+
     def is_denotative_word(self, token):
         """Check if a token represents a denotative word.
 

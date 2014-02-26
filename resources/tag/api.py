@@ -84,6 +84,8 @@ class TagSet(object):
     functions_as_noun_tags = []
     functions_as_adjective_tags = []
 
+    punctuation_tags = []
+
     def _is_in(self, token, _list):
         """Return true if the token's tag is in the list, and false otherwise.
         """
@@ -226,3 +228,11 @@ class TagSet(object):
         token -- a tokenized word (a pair (string, string)).
         """
         return self._is_in(token, self.functions_as_adjective_tags)
+
+    def is_punctuation(self, token):
+        """Check if a token represents a punctuation mark.
+
+        Required parameters:
+        token -- a tokenized word (a pair (string, string)).
+        """
+        return self._is_in(token, self.punctuation_tags)
