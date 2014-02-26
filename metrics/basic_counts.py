@@ -1,7 +1,7 @@
 from coh import base
 from coh.utils import ilen
 from coh.resources import syllable_separator, pos_tagger
-from itertools import chain
+from itertools import chain, filterfalse
 
 
 class Flesch(base.Metric):
@@ -30,7 +30,8 @@ class Words(base.Metric):
         super(Words, self).__init__(name, column_name)
 
     def value_for_text(self, t):
-        return ilen(t.all_words)
+        return ilen(filterfalse(pos_tagger.tagset.is_punctuation,
+                                t.tagged_words))
 
 
 class Sentences(base.Metric):
@@ -61,7 +62,7 @@ class WordsPerSentence(base.Metric):
         super(WordsPerSentence, self).__init__(name, column_name)
 
     def value_for_text(self, t):
-        return sum(map(len, t.words)) / ilen(t.sentences)
+        return Words().value_for_text(t) / Sentences().value_for_text(t)
 
 
 class SentencesPerParagraph(base.Metric):
@@ -72,7 +73,7 @@ class SentencesPerParagraph(base.Metric):
         super(SentencesPerParagraph, self).__init__(name, column_name)
 
     def value_for_text(self, t):
-        return ilen(t.sentences) / ilen(t.paragraphs)
+        return Sentences().value_for_text(t) / Paragraphs().value_for_text(t)
 
 
 class SyllablesPerContentWord(base.Metric):
@@ -189,6 +190,7 @@ class BasicCounts(base.Category):
     def __init__(self, name='Basic Counts', table_name='basic_counts'):
         super(BasicCounts, self).__init__(name, table_name)
         self._set_metrics_from_module(__name__)
+        self.metrics.sort(key=lambda m: m.name)
 
     def values_for_text(self, t):
         return super(BasicCounts, self).values_for_text(t)
