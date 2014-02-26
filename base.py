@@ -170,7 +170,8 @@ class Category(object):
         #                            for m in self.metrics])
         metrics_values = ResultSet([(m, m.value_for_text(text))
                                     for m in self.metrics])
-        return ResultSet([(self, metrics_values)])
+        #return ResultSet([(self, metrics_values)])
+        return metrics_values
 
     def __str__(self):
         return '<Category: %s: %s>' % \
