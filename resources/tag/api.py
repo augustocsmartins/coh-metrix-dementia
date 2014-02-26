@@ -60,7 +60,7 @@ class Tagger(object):
 
 class TagSet(object):
     """Represents a set of tags used by a tagger. This class is entended to
-    facilitate the use of multiple tagger with different tagsets.
+    facilitate the use of multiple taggers with different tagsets.
 
     Subclasses must, at least, define the *_tags lists.
     """
