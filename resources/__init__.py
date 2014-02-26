@@ -1,2 +1,6 @@
-from .tokenizers import pos_tagger, senter, word_tokenize
-from .syllable import *
+from coh.resources.tag import *
+
+pos_tagger = OpenNLPTagger()
+
+from coh.resources.tokenizers import senter, word_tokenize
+from coh.resources.syllable import *

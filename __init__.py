@@ -1,4 +1,4 @@
-from .base import (
+from coh.base import (
     Text,
     Category,
     Metric,
@@ -6,8 +6,8 @@ from .base import (
     ResultSet
 )
 
-from .metrics import *
-from .resources import *
+from coh.metrics import *
+from coh.resources import *
 
 __all__ = sorted([m for m in locals().keys()
                   if not m.startswith('_')])

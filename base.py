@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 # base.py - Basic classes for accessing Coh-Metrix-Port's functionality.
 # Copyright (C) 2014  Andre Luiz Verucci da Cunha
 #
@@ -13,6 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from itertools import chain
+from coh.resources import senter, word_tokenize,\
+    pos_tagger
+import codecs
 
 
 class Text(object):
@@ -44,7 +50,6 @@ class Text(object):
         self.publication_date = publication_date
         self.genre = genre
 
-        import codecs
         with codecs.open(filepath, mode='r', encoding=encoding)\
                 as input_file:
             content = input_file.readlines()
@@ -60,9 +65,6 @@ class Text(object):
         """Return a list of strings, each one being a sentence of the text.
         """
         if not hasattr(self, '_sentences'):
-            from itertools import chain
-            from .resources import senter
-
             _sentences = chain(*map(senter.tokenize, self.paragraphs))
             self._sentences = list(_sentences)
 
@@ -74,29 +76,42 @@ class Text(object):
             corresponds to a sentence, and each string in the list is a word.
         """
         if not hasattr(self, '_words'):
-            from .resources import word_tokenize
-
             self._words = list(map(word_tokenize, self.sentences))
 
         return self._words
 
     @property
-    def tokenized_sentences(self):
-        """Return a list of lists of pairs (string, string), representing
-            the sentences with tokenized words.
+    def all_words(self):
+        """Return all words of the text in a single list.
         """
-        if not hasattr(self, '_tokenized_sentences'):
-            from .resources import pos_tagger
 
-            self._tokenized_sentences = pos_tagger.batch_tag(self.words)
+        return list(chain(self.words))
 
-        return self._tokenized_sentences
+    @property
+    def tagged_sentences(self):
+        """Return a list of lists of pairs (string, string), representing
+            the sentences with tagged words.
+        """
+        if not hasattr(self, '_tagged_sentences'):
+            self._tagged_sentences = pos_tagger.batch_tag(self.words)
+
+        return self._tagged_sentences
+
+    @property
+    def tagged_words(self):
+        """Return a list of pair (string, string), representing the tokens
+            not separated in sentences.
+        """
+        if not hasattr(self, '_tagged_words'):
+            self._tagged_words = chain(self.all_words)
+
+        return list(self._tagged_words)
 
 
 class Category(object):
     """Represents a set of taxonomically related metrics.
     """
-    def __init__(self, name="", table_name="", desc=""):
+    def __init__(self, name="", table_name="", desc=None):
         """Form a category.
 
         Keyword arguments:
@@ -107,7 +122,8 @@ class Category(object):
             specified, Coh-Metrix-Port will check whether 'name' is a valid
             table name; if so, 'name' is used as the table name. (default "")
         desc -- A longer description of the category. Used for UI purposes.
-            (default "")
+            If no value is passed, the docstring of the class is used.
+            (default None)
         """
         if name == '':
             name = self.__class__.__name__
@@ -117,6 +133,9 @@ class Category(object):
             # TODO: check if 'name' is a valid table name.
             table_name = name
         self.table_name = table_name
+
+        if desc is None:
+            desc = self.__doc__
 
         self.desc = desc
 
