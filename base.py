@@ -65,7 +65,8 @@ class Text(object):
         """Return a list of strings, each one being a sentence of the text.
         """
         if not hasattr(self, '_sentences'):
-            _sentences = chain(*map(senter.tokenize, self.paragraphs))
+            _sentences = chain.from_iterable(
+                map(senter.tokenize, self.paragraphs))
             self._sentences = list(_sentences)
 
         return self._sentences
@@ -84,8 +85,10 @@ class Text(object):
     def all_words(self):
         """Return all words of the text in a single list.
         """
+        if not hasattr(self, '_all_words'):
+            self._all_words = list(chain.from_iterable(self.words))
 
-        return list(chain(self.words))
+        return self._all_words
 
     @property
     def tagged_sentences(self):
@@ -103,9 +106,10 @@ class Text(object):
             not separated in sentences.
         """
         if not hasattr(self, '_tagged_words'):
-            self._tagged_words = chain(self.all_words)
+            self._tagged_words = list(
+                chain.from_iterable(self.tagged_sentences))
 
-        return list(self._tagged_words)
+        return self._tagged_words
 
 
 class Category(object):
@@ -139,22 +143,19 @@ class Category(object):
 
         self.desc = desc
 
-    def _set_metrics_from_module(self, module, category):
+    def _set_metrics_from_module(self, module):
         """Set self.metrics as the list of Metric subclasses declared in
             a module.
 
         Required arguments:
         module -- the name of module that will be scanned for metrics.
-        category -- the name of the Category define in the module, which will
-            not be included in the metrics list.
         """
         import sys
         import inspect
 
-        #TODO: use 'is subclass' instead of '__name__ != category'.
-        self.metrics = [obj() for name, obj
+        self.metrics = [obj() for _, obj
                         in inspect.getmembers(sys.modules[module])
-                        if inspect.isclass(obj) and obj.__name__ != category]
+                        if inspect.isclass(obj) and issubclass(obj, Metric)]
 
     def values_for_text(self, text):
         """Calculate the value of each metric in a text and return it in a
