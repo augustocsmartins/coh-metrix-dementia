@@ -241,7 +241,25 @@ class Metric(object):
 
 class MetricsSet(object):
     def __init__(self, categories):
-        pass
+        self.categories = categories
+
+    def _set_categories_from_module(self, module):
+        """Set self.categories as the list of Category subclasses
+            declared in a module.
+
+        Required arguments:
+        module -- the name of module that will be scanned for categories.
+        """
+        import sys
+        import inspect
+
+        self.categories = [obj() for _, obj
+                           in inspect.getmembers(sys.modules[module])
+                           if inspect.isclass(obj)
+                           and issubclass(obj, Category)]
+
+    def values_for_text(self, t):
+        return ResultSet([(c, c.values_for_text(t)) for c in self.categories])
 
 import collections
 

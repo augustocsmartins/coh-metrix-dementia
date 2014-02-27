@@ -1,4 +1,1 @@
-from .basic_counts import (
-    Flesch,
-    Words,
-)
+from coh.metrics.basic_counts import *
