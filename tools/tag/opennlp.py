@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from coh.resources.tag.api import Tagger
-from coh.resources.tag.macmorpho import MacMorphoTagSet
+from coh.tools.tag.api import Tagger
+from coh.tools.tag.macmorpho import MacMorphoTagSet
 from coh.utils import base_path
 from nltk.tag import OpenNLPPoSTagger
 

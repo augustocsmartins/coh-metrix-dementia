@@ -1,6 +1,6 @@
 from coh import base
 from coh.utils import ilen
-from coh.resources import syllable_separator, pos_tagger
+from coh.tools import syllable_separator, pos_tagger
 from itertools import chain, filterfalse
 
 

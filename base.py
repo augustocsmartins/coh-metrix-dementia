@@ -16,7 +16,7 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from itertools import chain
-from coh.resources import senter, word_tokenize,\
+from coh.tools import senter, word_tokenize,\
     pos_tagger
 import codecs
 

@@ -7,7 +7,7 @@ from coh.base import (
 )
 
 from coh.metrics import *
-from coh.resources import *
+from coh.tools import *
 
 all_metrics = MetricsSet([BasicCounts()])
 

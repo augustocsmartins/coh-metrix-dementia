@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from coh.resources.tag.api import TagSet
+from coh.tools.tag.api import TagSet
 
 
 class MacMorphoTagSet(TagSet):
