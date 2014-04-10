@@ -96,7 +96,7 @@ class Text(object):
             the sentences with tagged words.
         """
         if not hasattr(self, '_tagged_sentences'):
-            self._tagged_sentences = pos_tagger.batch_tag(self.words)
+            self._tagged_sentences = pos_tagger.tag_sents(self.words)
 
         return self._tagged_sentences
 

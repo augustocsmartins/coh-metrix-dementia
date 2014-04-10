@@ -43,9 +43,9 @@ class Tagger(object):
         A list of pairs (string, string), where the first string is the token
             and the second one is the corresponding PoS tag.
         """
-        return self.batch_tag([tokens])[0]
+        return self.tag_sents([tokens])[0]
 
-    def batch_tag(self, sentences):
+    def tag_sents(self, sentences):
         """Assign part-of-speech tags to multiple sentences at once.
 
         Required parameters:
@@ -73,7 +73,7 @@ class TagSet(object):
     adverb_tags = []
     pronoun_tags = []
     numeral_tags = []
-    conjuntion_tags = []
+    conjunction_tags = []
     preposition_tags = []
     interjection_tags = []
     currency_tags = []
