@@ -270,42 +270,52 @@ class ResultSet():
     """
     def __init__(self, *args, **kwargs):
         #TODO: To improve performance, replace OrderedDict by namedtuple.
-        self.store = collections.OrderedDict(*args, **kwargs)
+        self._store = collections.OrderedDict(*args, **kwargs)
 
     def items(self):
-        return self.store.items()
+        return self._store.items()
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            key = list(self.store.items())[key][0]
-        return self.store[self.__keytransform__(key)]
+            key = list(self._store.items())[key][0]
+        return self._store[key]
 
     def __setitem__(self, key, value):
-        self.store[self.__keytransform__(key)] = value
+        self._store[key] = value
 
     def __delitem__(self, key):
-        del self.store[self.__keytransform__(key)]
+        del self._store[key]
 
     def __iter__(self):
-        return iter(self.store)
+        return iter(self._store)
 
     def __len__(self):
-        return len(self.store)
-
-    def __keytransform__(self, key):
-        return key
+        return len(self._store)
 
     def __getattr__(self, attr):
-        for key in self.store.keys():
+        for key in self._store.keys():
             if (isinstance(key, Category) and key.table_name == attr) or \
                (isinstance(key, Metric) and key.column_name == attr):
-                return self.store[key]
+                return self._store[key]
 
     def __str__(self):
+        from prettytable import PrettyTable
+
+        table = PrettyTable(['Metric', 'Value'])
+        table.align['Metric'] = 'r'
+        table.align['Value'] = 'r'
+        table.padding_width = 1
+
         string = ''
-        for key, value in self.store.items():
+        for key, value in self._store.items():
             if isinstance(key, Category):
-                string = string + '%s:\n%s' % (key.name, value)
+                string = string + '%s:\n%s\n' % (key.name, value)
+                is_table = False
             elif isinstance(key, Metric):
-                string = string + '    %s: %s\n' % (key.name, value)
+                table.add_row([key.name, str(value)])
+                is_table = True
+
+        if is_table:
+            string = table.get_string()
+
         return string.rstrip()
