@@ -263,7 +263,7 @@ class MetricsSet(object):
         return ResultSet([(c, c.values_for_text(t)) for c in self.categories])
 
 
-class ResultSet():
+class ResultSet(object):
     """A dictionary-like structure that represents the values of
         a set of metrics extracted from a text.
     """
