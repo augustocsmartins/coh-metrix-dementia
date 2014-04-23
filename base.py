@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # base.py - Basic classes for accessing Coh-Metrix-Port's functionality.
 # Copyright (C) 2014  Andre Luiz Verucci da Cunha
 #
@@ -344,6 +344,7 @@ class ResourcePool(object):
 
         """
         self._res[suffix] = hook
+        setattr(self, suffix, lambda t: self.get(t, suffix))
 
     def get(self, text, suffix):
         """Get a resource.
@@ -360,3 +361,53 @@ class ResourcePool(object):
                 print('Resource', suffix, 'calculated for text', text)
 
         return self._cache[(text, suffix)]
+
+
+class DefaultResourcePool(ResourcePool):
+    """A resource pool that uses the standard tools.
+    """
+    def __init__(self, debug=False):
+        """Registers the default resources."""
+        super(DefaultResourcePool, self).__init__(debug)
+
+        self.register('paragraphs', lambda t: t.paragraphs)
+        self.register('sentences', self._sentences)
+        self.register('words', self._words)
+        self.register('all_words', self._all_words)
+        self.register('tagged_sentences', self._tagged_sentences)
+        self.register('tagged_words', self._tagged_words)
+
+    def _sentences(self, text):
+        """Return a list of strings, each one being a sentence of the text.
+        """
+        paragraphs = self.get(text, 'paragraphs')
+        sentences = chain.from_iterable(
+            [senter.tokenize(p) for p in paragraphs])
+        return list(sentences)
+
+    def _words(self, text):
+        """Return a list of lists of strings, where each list of strings
+            corresponds to a sentence, and each string in the list is a word.
+        """
+        sentences = self.get(text, 'sentences')
+        return list([word_tokenize(sent) for sent in sentences])
+
+    def _all_words(self, text):
+        """Return all words of the text in a single list.
+        """
+        words = self.get(text, 'words')
+        return list(chain.from_iterable(words))
+
+    def _tagged_sentences(self, text):
+        """Return a list of lists of pairs (string, string), representing
+            the sentences with tagged words.
+        """
+        words = self.get(text, 'words')
+        return pos_tagger.tag_sents(words)
+
+    def _tagged_words(self, text):
+        """Return a list of pair (string, string), representing the tokens
+            not separated in sentences.
+        """
+        tagged_sentences = self.get(text, 'tagged_sentences')
+        return list(chain.from_iterable(tagged_sentences))
