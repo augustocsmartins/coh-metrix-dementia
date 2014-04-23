@@ -19,9 +19,9 @@ class ResourcePool(object):
     def register(self, suffix, hook):
         """Register a new resource.
 
-        :suffix: @todo
-        :hook: @todo
-        :returns: @todo
+        :suffix: A string identifying the resource type.
+        :hook: The method that, when called, generates the resource data.
+        :returns: None.
 
         """
         self._res[suffix] = hook
@@ -29,9 +29,9 @@ class ResourcePool(object):
     def get(self, text, suffix):
         """Get a resource.
 
-        :text: @todo
-        :id: @todo
-        :returns: @todo
+        :text: The text to be analyzed.
+        :suffix: The type of the resource to be extracted.
+        :returns: The resource data (as returned by the resource's hook.)
 
         """
         if (text, suffix) not in self._cache:
