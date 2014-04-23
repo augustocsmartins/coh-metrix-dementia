@@ -9,9 +9,11 @@ class ResourcePool(object):
     """
     def __init__(self, debug=False):
         """Form a new resource pool."""
-        self._res = {}  # The resources, in the form {<suffix> : <hook>}.
-        self._cache = {}  # Resources already asked for, in the form
-# {(<text>, <suffix>) : <data>}.
+        # The resources, in the form {<suffix> : <hook>}.
+        self._res = {}
+        # Resources already asked for, in the form
+        # {(<text>, <suffix>) : <data>}.
+        self._cache = {}
         self._debug = debug
 
     def register(self, suffix, hook):
