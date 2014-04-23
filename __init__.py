@@ -3,7 +3,8 @@ from coh.base import (
     Category,
     Metric,
     MetricsSet,
-    ResultSet
+    ResultSet,
+    ResourcePool,
 )
 
 from coh.metrics import *
