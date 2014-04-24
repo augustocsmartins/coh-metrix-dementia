@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from coh import base
+from coh.resource_pool import rp as default_rp
 
 
 LOGIC_OPERATORS = [
@@ -45,11 +46,11 @@ class LogicOperatorsIncidence(base.Metric):
                  column_name='logic_operators'):
         super(LogicOperatorsIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        lowercase_words = ' '.join(map(str.lower, t.all_words)) + ' '
+    def value_for_text(self, t, rp=default_rp):
+        lowercase_words = ' '.join(map(str.lower, rp.all_words(t))) + ' '
         incidences = [lowercase_words.count(op + ' ')
                       for op in LOGIC_OPERATORS]
-        return sum(incidences) / len(t.all_words)
+        return sum(incidences) / len(rp.all_words(t))
 
 
 class AndIncidence(base.Metric):
@@ -57,10 +58,10 @@ class AndIncidence(base.Metric):
     def __init__(self, name='Incidence of ANDs.', column_name='and_incidence'):
         super(AndIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        lowercase_words = ' '.join(map(str.lower, t.all_words)) + ' '
+    def value_for_text(self, t, rp=default_rp):
+        lowercase_words = ' '.join(map(str.lower, rp.all_words(t))) + ' '
         incidences = [lowercase_words.count('e ')]
-        return sum(incidences) / len(t.all_words)
+        return sum(incidences) / len(rp.all_words(t))
 
 
 class OrIncidence(base.Metric):
@@ -68,10 +69,10 @@ class OrIncidence(base.Metric):
     def __init__(self, name='Incidence of ORs.', column_name='or_incidence'):
         super(OrIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        lowercase_words = ' '.join(map(str.lower, t.all_words)) + ' '
+    def value_for_text(self, t, rp=default_rp):
+        lowercase_words = ' '.join(map(str.lower, rp.all_words(t))) + ' '
         incidences = [lowercase_words.count('ou ')]
-        return sum(incidences) / len(t.all_words)
+        return sum(incidences) / len(rp.all_words(t))
 
 
 class IfIncidence(base.Metric):
@@ -79,10 +80,10 @@ class IfIncidence(base.Metric):
     def __init__(self, name='Incidence of IFs.', column_name='if_incidence'):
         super(IfIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        lowercase_words = ' '.join(map(str.lower, t.all_words)) + ' '
+    def value_for_text(self, t, rp=default_rp):
+        lowercase_words = ' '.join(map(str.lower, rp.all_words(t))) + ' '
         incidences = [lowercase_words.count('se ')]
-        return sum(incidences) / len(t.all_words)
+        return sum(incidences) / len(rp.all_words(t))
 
 
 class NegationIncidence(base.Metric):
@@ -91,10 +92,10 @@ class NegationIncidence(base.Metric):
                  column_name='negation_incidence'):
         super(NegationIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        lowercase_words = ' '.join(map(str.lower, t.all_words)) + ' '
+    def value_for_text(self, t, rp=default_rp):
+        lowercase_words = ' '.join(map(str.lower, rp.all_words(t))) + ' '
         incidences = [lowercase_words.count(op + ' ') for op in NEGATIONS]
-        return sum(incidences) / len(t.all_words)
+        return sum(incidences) / len(rp.all_words(t))
 
 
 class LogicOperators(base.Category):
@@ -104,5 +105,5 @@ class LogicOperators(base.Category):
         self._set_metrics_from_module(__name__)
         self.metrics.sort(key=lambda m: m.name)
 
-    def values_for_text(self, t):
-        return super(LogicOperators, self).values_for_text(t)
+    def values_for_text(self, t, rp=default_rp):
+        return super(LogicOperators, self).values_for_text(t, rp)

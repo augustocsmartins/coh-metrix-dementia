@@ -1,6 +1,7 @@
 from coh import base
 from coh.utils import ilen
 from coh.tools import syllable_separator, pos_tagger
+from coh.resource_pool import rp as default_rp
 from itertools import chain, filterfalse
 
 
@@ -10,12 +11,12 @@ class Flesch(base.Metric):
     def __init__(self, name='Flesch index', column_name='flesch'):
         super(Flesch, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
+    def value_for_text(self, t, rp=default_rp):
         mean_words_per_sentence = WordsPerSentence().value_for_text(t)
 
         syllables = chain.from_iterable(
-            map(syllable_separator.separate, t.all_words))
-        mean_syllables_per_word = ilen(syllables) / ilen(t.all_words)
+            map(syllable_separator.separate, rp.all_words(t)))
+        mean_syllables_per_word = ilen(syllables) / ilen(rp.all_words(t))
 
         flesch = 164.835 - 1.015 * mean_words_per_sentence\
             - 84.6 * mean_syllables_per_word
@@ -29,9 +30,9 @@ class Words(base.Metric):
     def __init__(self, name='Number of Words', column_name='words'):
         super(Words, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
+    def value_for_text(self, t, rp=default_rp):
         return ilen(filterfalse(pos_tagger.tagset.is_punctuation,
-                                t.tagged_words))
+                                rp.tagged_words(t)))
 
 
 class Sentences(base.Metric):
@@ -40,8 +41,8 @@ class Sentences(base.Metric):
     def __init__(self, name='Number of Sentences', column_name='sentences'):
         super(Sentences, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        return ilen(t.sentences)
+    def value_for_text(self, t, rp=default_rp):
+        return ilen(rp.sentences(t))
 
 
 class Paragraphs(base.Metric):
@@ -50,8 +51,8 @@ class Paragraphs(base.Metric):
     def __init__(self, name='Number of Paragraphs', column_name='paragraphs'):
         super(Paragraphs, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        return ilen(t.paragraphs)
+    def value_for_text(self, t, rp=default_rp):
+        return ilen(rp.paragraphs(t))
 
 
 class WordsPerSentence(base.Metric):
@@ -61,7 +62,7 @@ class WordsPerSentence(base.Metric):
                  column_name='words_per_sentence'):
         super(WordsPerSentence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
+    def value_for_text(self, t, rp=default_rp):
         return Words().value_for_text(t) / Sentences().value_for_text(t)
 
 
@@ -72,7 +73,7 @@ class SentencesPerParagraph(base.Metric):
                  column_name='sentences_per_paragraph'):
         super(SentencesPerParagraph, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
+    def value_for_text(self, t, rp=default_rp):
         return Sentences().value_for_text(t) / Paragraphs().value_for_text(t)
 
 
@@ -83,9 +84,9 @@ class SyllablesPerContentWord(base.Metric):
                  column_name='syllables_per_content_word'):
         super(SyllablesPerContentWord, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
+    def value_for_text(self, t, rp=default_rp):
         content_tokens = filter(pos_tagger.tagset.is_content_word,
-                                t.tagged_words)
+                                rp.tagged_words(t))
         content_words = map(lambda t: t[0], content_tokens)
 
         syllables = map(syllable_separator.separate, content_words)
@@ -106,9 +107,9 @@ class VerbIncidence(base.Metric):
                  column_name='verbs'):
         super(VerbIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        verbs = filter(pos_tagger.tagset.is_verb, t.tagged_words)
-        return ilen(verbs) / ilen(t.all_words)
+    def value_for_text(self, t, rp=default_rp):
+        verbs = filter(pos_tagger.tagset.is_verb, rp.tagged_words(t))
+        return ilen(verbs) / ilen(rp.all_words(t))
 
 
 class NounIncidence(base.Metric):
@@ -118,9 +119,9 @@ class NounIncidence(base.Metric):
                  column_name='nouns'):
         super(NounIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        nouns = filter(pos_tagger.tagset.is_noun, t.tagged_words)
-        return ilen(nouns) / ilen(t.all_words)
+    def value_for_text(self, t, rp=default_rp):
+        nouns = filter(pos_tagger.tagset.is_noun, rp.tagged_words(t))
+        return ilen(nouns) / ilen(rp.all_words(t))
 
 
 class AdjectiveIncidence(base.Metric):
@@ -130,9 +131,9 @@ class AdjectiveIncidence(base.Metric):
                  column_name='adjectives'):
         super(AdjectiveIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        adjectives = filter(pos_tagger.tagset.is_adjective, t.tagged_words)
-        return ilen(adjectives) / ilen(t.all_words)
+    def value_for_text(self, t, rp=default_rp):
+        adjectives = filter(pos_tagger.tagset.is_adjective, rp.tagged_words(t))
+        return ilen(adjectives) / ilen(rp.all_words(t))
 
 
 class AdverbIncidence(base.Metric):
@@ -142,9 +143,9 @@ class AdverbIncidence(base.Metric):
                  column_name='adverbs'):
         super(AdverbIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        adverbs = filter(pos_tagger.tagset.is_adverb, t.tagged_words)
-        return ilen(adverbs) / ilen(t.all_words)
+    def value_for_text(self, t, rp=default_rp):
+        adverbs = filter(pos_tagger.tagset.is_adverb, rp.tagged_words(t))
+        return ilen(adverbs) / ilen(rp.all_words(t))
 
 
 class PronounIncidence(base.Metric):
@@ -154,9 +155,9 @@ class PronounIncidence(base.Metric):
                  column_name='pronouns'):
         super(PronounIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
-        pronouns = filter(pos_tagger.tagset.is_pronoun, t.tagged_words)
-        return ilen(pronouns) / ilen(t.all_words)
+    def value_for_text(self, t, rp=default_rp):
+        pronouns = filter(pos_tagger.tagset.is_pronoun, rp.tagged_words(t))
+        return ilen(pronouns) / ilen(rp.all_words(t))
 
 
 class ContentWordIncidence(base.Metric):
@@ -166,10 +167,10 @@ class ContentWordIncidence(base.Metric):
                  column_name='content_words'):
         super(ContentWordIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
+    def value_for_text(self, t, rp=default_rp):
         content_words = filter(pos_tagger.tagset.is_content_word,
-                               t.tagged_words)
-        return ilen(content_words) / ilen(t.all_words)
+                               rp.tagged_words(t))
+        return ilen(content_words) / ilen(rp.all_words(t))
 
 
 class FunctionWordIncidence(base.Metric):
@@ -179,10 +180,10 @@ class FunctionWordIncidence(base.Metric):
                  column_name='function_words'):
         super(FunctionWordIncidence, self).__init__(name, column_name)
 
-    def value_for_text(self, t):
+    def value_for_text(self, t, rp=default_rp):
         function_words = filter(pos_tagger.tagset.is_function_word,
-                                t.tagged_words)
-        return ilen(function_words) / ilen(t.all_words)
+                                rp.tagged_words(t))
+        return ilen(function_words) / ilen(rp.all_words(t))
 
 
 class BasicCounts(base.Category):
@@ -192,5 +193,5 @@ class BasicCounts(base.Category):
         self._set_metrics_from_module(__name__)
         self.metrics.sort(key=lambda m: m.name)
 
-    def values_for_text(self, t):
-        return super(BasicCounts, self).values_for_text(t)
+    def values_for_text(self, t, rp=default_rp):
+        return super(BasicCounts, self).values_for_text(t, rp)

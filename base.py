@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from itertools import chain
-from coh.tools import senter, word_tokenize,\
-    pos_tagger
+from coh.utils import is_valid_id
+from coh.resource_pool import ResourcePool,\
+    DefaultResourcePool, rp as default_rp
 import codecs
 import collections
 
@@ -61,82 +61,33 @@ class Text(object):
     def __str__(self):
         return '<Text: "%s...">' % (self.paragraphs[0][:70])
 
-    @property
-    def sentences(self):
-        """Return a list of strings, each one being a sentence of the text.
-        """
-        if not hasattr(self, '_sentences'):
-            _sentences = chain.from_iterable(
-                map(senter.tokenize, self.paragraphs))
-            self._sentences = list(_sentences)
-
-        return self._sentences
-
-    @property
-    def words(self):
-        """Return a list of lists of strings, where each list of strings
-            corresponds to a sentence, and each string in the list is a word.
-        """
-        if not hasattr(self, '_words'):
-            self._words = list(map(word_tokenize, self.sentences))
-
-        return self._words
-
-    @property
-    def all_words(self):
-        """Return all words of the text in a single list.
-        """
-        if not hasattr(self, '_all_words'):
-            self._all_words = list(chain.from_iterable(self.words))
-
-        return self._all_words
-
-    @property
-    def tagged_sentences(self):
-        """Return a list of lists of pairs (string, string), representing
-            the sentences with tagged words.
-        """
-        if not hasattr(self, '_tagged_sentences'):
-            self._tagged_sentences = pos_tagger.tag_sents(self.words)
-
-        return self._tagged_sentences
-
-    @property
-    def tagged_words(self):
-        """Return a list of pair (string, string), representing the tokens
-            not separated in sentences.
-        """
-        if not hasattr(self, '_tagged_words'):
-            self._tagged_words = list(
-                chain.from_iterable(self.tagged_sentences))
-
-        return self._tagged_words
-
 
 class Category(object):
     """Represents a set of taxonomically related metrics.
     """
-    def __init__(self, name="", table_name="", desc=None):
+    def __init__(self, name=None, table_name=None, desc=None):
         """Form a category.
 
         Keyword arguments:
         name -- A succint name of the category (e.g., 'Basic Counts'). If
-            no name is provided, the class name is used. (default "")
+            no name is provided, the class name is used. (default None).
         table_name -- The name of the table in coh_user_data that contains
             the values of this category on the users's texts. If no value is
             specified, Coh-Metrix-Port will check whether 'name' is a valid
-            table name; if so, 'name' is used as the table name. (default "")
+            table name; if so, 'name' is used as the table name. (default None)
         desc -- A longer description of the category. Used for UI purposes.
             If no value is passed, the docstring of the class is used.
             (default None)
         """
-        if name == '':
+        if name is None:
             name = self.__class__.__name__
         self.name = name
 
-        if table_name == '':
-            # TODO: check if 'name' is a valid table name.
-            table_name = name
+        if table_name is None:
+            if is_valid_id(name):
+                table_name = name
+            else:
+                raise ValueError('No valid table name provided.')
         self.table_name = table_name
 
         if desc is None:
@@ -158,7 +109,7 @@ class Category(object):
                         in inspect.getmembers(sys.modules[module])
                         if inspect.isclass(obj) and issubclass(obj, Metric)]
 
-    def values_for_text(self, text):
+    def values_for_text(self, text, rp=default_rp):
         """Calculate the value of each metric in a text and return it in a
             ResultSet.
 
@@ -199,31 +150,33 @@ class Metric(object):
     """A metric is a textual characteristic.
     """
 
-    def __init__(self, name="", column_name="", desc=""):
+    def __init__(self, name=None, column_name=None, desc=None):
         """Form a metric.
 
         Keyword arguments:
         name -- A succint name of the metric (e.g., 'Flesch index'). If
-            no name is provided, the class name is used. (default "")
+            no name is provided, the class name is used. (default None)
         table_name -- The name of the column in the table corresponding to
             the category of this metric in coh_user_data. If no value is
             specified, Coh-Metrix-Port will check whether 'name' is a valid
-            table name; if so, 'name' is used as the table name. (default "")
+            table name; if so, 'name' is used as the table name. (default None)
         desc -- A longer description of the metric. Used for UI purposes.
-            (default "")
+            (default None)
         """
-        if name == '':
+        if name is None:
             name = self.__class__.__name__
         self.name = name
 
-        if column_name == '':
-            # TODO: check if 'name' is a valid table name.
-            column_name = name
+        if column_name is None:
+            if is_valid_id(name):
+                column_name = name
+            else:
+                raise ValueError('No valid column name provided.')
         self.column_name = column_name
 
         self.desc = desc
 
-    def value_for_text(self, text):
+    def value_for_text(self, text, rp=default_rp):
         """Calculate the value of the metric in the text.
 
         Required arguments:
@@ -231,10 +184,7 @@ class Metric(object):
 
         Returns: an integer value, corresponding to the metric.
         """
-        from random import randrange
-        #return ResultSet([(self, randrange(1, 100))])
-        #TODO: replace by an exception raising.
-        return randrange(1, 100)
+        raise NotImplementedError('Subclasses should implement this method!')
 
     def __str__(self):
         return '<Metric: %s> ' % (self.name)
@@ -320,94 +270,3 @@ class ResultSet(object):
         return string.rstrip()
 
 
-class ResourcePool(object):
-    """A resource pool is a repository of methods for extracting data from
-    texts. It centralizes tasks like PoS-tagging and sentence splitting,
-    allowing synchronization among threads and use of multiple tools for
-    the same task (e.g., taggers).
-    """
-    def __init__(self, debug=False):
-        """Form a new resource pool."""
-        # The resources, in the form {<suffix> : <hook>}.
-        self._res = {}
-        # Resources already asked for, in the form
-        # {(<text>, <suffix>) : <data>}.
-        self._cache = {}
-        self._debug = debug
-
-    def register(self, suffix, hook):
-        """Register a new resource.
-
-        :suffix: A string identifying the resource type.
-        :hook: The method that, when called, generates the resource data.
-        :returns: None.
-
-        """
-        self._res[suffix] = hook
-        setattr(self, suffix, lambda t: self.get(t, suffix))
-
-    def get(self, text, suffix):
-        """Get a resource.
-
-        :text: The text to be analyzed.
-        :suffix: The type of the resource to be extracted.
-        :returns: The resource data (as returned by the resource's hook.)
-
-        """
-        if (text, suffix) not in self._cache:
-            self._cache[(text, suffix)] = self._res[suffix](text)
-
-            if self._debug:
-                print('Resource', suffix, 'calculated for text', text)
-
-        return self._cache[(text, suffix)]
-
-
-class DefaultResourcePool(ResourcePool):
-    """A resource pool that uses the standard tools.
-    """
-    def __init__(self, debug=False):
-        """Registers the default resources."""
-        super(DefaultResourcePool, self).__init__(debug)
-
-        self.register('paragraphs', lambda t: t.paragraphs)
-        self.register('sentences', self._sentences)
-        self.register('words', self._words)
-        self.register('all_words', self._all_words)
-        self.register('tagged_sentences', self._tagged_sentences)
-        self.register('tagged_words', self._tagged_words)
-
-    def _sentences(self, text):
-        """Return a list of strings, each one being a sentence of the text.
-        """
-        paragraphs = self.get(text, 'paragraphs')
-        sentences = chain.from_iterable(
-            [senter.tokenize(p) for p in paragraphs])
-        return list(sentences)
-
-    def _words(self, text):
-        """Return a list of lists of strings, where each list of strings
-            corresponds to a sentence, and each string in the list is a word.
-        """
-        sentences = self.get(text, 'sentences')
-        return list([word_tokenize(sent) for sent in sentences])
-
-    def _all_words(self, text):
-        """Return all words of the text in a single list.
-        """
-        words = self.get(text, 'words')
-        return list(chain.from_iterable(words))
-
-    def _tagged_sentences(self, text):
-        """Return a list of lists of pairs (string, string), representing
-            the sentences with tagged words.
-        """
-        words = self.get(text, 'words')
-        return pos_tagger.tag_sents(words)
-
-    def _tagged_words(self, text):
-        """Return a list of pair (string, string), representing the tokens
-            not separated in sentences.
-        """
-        tagged_sentences = self.get(text, 'tagged_sentences')
-        return list(chain.from_iterable(tagged_sentences))
