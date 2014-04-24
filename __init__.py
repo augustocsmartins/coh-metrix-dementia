@@ -4,8 +4,12 @@ from coh.base import (
     Metric,
     MetricsSet,
     ResultSet,
+)
+
+from coh.resource_pool import (
     ResourcePool,
     DefaultResourcePool,
+    rp,
 )
 
 from coh.metrics import *
