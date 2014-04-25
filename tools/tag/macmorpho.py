@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # macmorpho.py - The tagset used to annotate the MacMorpho corpus.
 # Copyright (C) 2014  Andre Luiz Verucci da Cunha
 #
@@ -19,6 +19,8 @@ from coh.tools.tag.api import TagSet
 
 
 class MacMorphoTagSet(TagSet):
+    """The tagset used to annotate the MacMorpho corpus.
+    """
     article_tags = ['ART']
     verb_tags = ['V']
     auxiliary_verb_tags = ['VAUX']
@@ -67,3 +69,39 @@ class MacMorphoTagSet(TagSet):
         token -- a tokenized word (a pair (string, string)).
         """
         return self._is_in(token, self.denotative_word_tags)
+
+    logic_operators = (
+        (('e', 'KC')),
+        (('ou', 'KC')),
+        (('se', 'KS')),
+        (('não', 'ADV')),
+        (('nem', 'KC')),
+        (('nenhum', 'PROAJD||PROSUB')),
+        (('nenhuma', 'PROADJ||PROSUB')),
+        (('nada', 'PROADJ||PROSUB')),
+        (('nunca', 'ADV')),
+        (('jamais', 'ADV')),
+        (('caso', 'KS')),
+        (('desde', 'KS'), ('que', 'KS')),
+        (('contanto', 'KS'), ('que', 'KS')),
+        (('uma', 'KS'), ('vez', 'KS'), ('que', 'KS')),
+        (('a', 'KS'), ('menos', 'KS'), ('que', 'KS')),
+        (('sem', 'KS'), ('que', 'KS')),
+        (('a', 'KS'), ('não', 'KS'), ('ser', 'KS'), ('que', 'KS')),
+        (('salvo', 'KS'), ('se', 'KS')),
+        (('exceto', 'KS'), ('se', 'KS')),
+        (('então', '???'), ('é', '???'), ('porque', '???')),
+        (('fosse...fosse', '???')),  # TODO: check how to handle this.
+        (('vai', '???'), ('que', '???')),
+        (('va', '???'), ('que', '???')),
+    )
+
+    negations = (
+        (('não', 'ADV')),
+        (('nem', 'KC')),
+        (('nenhum', 'PROAJD||PROSUB')),
+        (('nenhuma', 'PROADJ||PROSUB')),
+        (('nada', 'PROADJ||PROSUB')),
+        (('nunca', 'ADV')),
+        (('jamais', 'ADV')),
+    )
