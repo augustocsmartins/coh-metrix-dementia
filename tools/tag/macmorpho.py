@@ -76,9 +76,9 @@ class MacMorphoTagSet(TagSet):
         (('se', 'KS')),
         (('não', 'ADV')),
         (('nem', 'KC')),
-        (('nenhum', 'PROAJD||PROSUB')),
-        (('nenhuma', 'PROADJ||PROSUB')),
-        (('nada', 'PROADJ||PROSUB')),
+        (('nenhum', ('PROAJD', 'PROSUB'))),
+        (('nenhuma', ('PROADJ', 'PROSUB'))),
+        (('nada', ('PROADJ', 'PROSUB'))),
         (('nunca', 'ADV')),
         (('jamais', 'ADV')),
         (('caso', 'KS')),
@@ -90,18 +90,18 @@ class MacMorphoTagSet(TagSet):
         (('a', 'KS'), ('não', 'KS'), ('ser', 'KS'), ('que', 'KS')),
         (('salvo', 'KS'), ('se', 'KS')),
         (('exceto', 'KS'), ('se', 'KS')),
-        (('então', '???'), ('é', '???'), ('porque', '???')),
-        (('fosse...fosse', '???')),  # TODO: check how to handle this.
-        (('vai', '???'), ('que', '???')),
-        (('va', '???'), ('que', '???')),
+        (('então', 'KS'), ('é', 'KS'), ('porque', 'KS')),
+        (('fosse...fosse', '??')),  # TODO: check how to handle this.
+        (('vai', 'KS'), ('que', 'KS')),
+        (('va', 'KS'), ('que', 'KS')),
     )
 
     negations = (
         (('não', 'ADV')),
         (('nem', 'KC')),
-        (('nenhum', 'PROAJD||PROSUB')),
-        (('nenhuma', 'PROADJ||PROSUB')),
-        (('nada', 'PROADJ||PROSUB')),
+        (('nenhum', ('PROAJD', 'PROSUB'))),
+        (('nenhuma', ('PROADJ', 'PROSUB'))),
+        (('nada', ('PROADJ', 'PROSUB'))),
         (('nunca', 'ADV')),
         (('jamais', 'ADV')),
     )
